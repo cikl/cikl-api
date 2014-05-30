@@ -10,6 +10,8 @@ gem 'elasticsearch'
 gem 'connection_pool'
 gem 'jbuilder'
 gem 'hashie'
+gem 'typhoeus'
+
 gem 'oj', :platforms => 'ruby'
 gem 'jrjackson', :platforms => 'jruby'
 
