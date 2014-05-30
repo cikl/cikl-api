@@ -36,7 +36,7 @@ module Cikl
             body: query
           })
 
-          present hits_to_response(es_response['hits']['hits'])
+          present hits_to_response(es_response['hits']['hits']), with: Cikl::API::Entities::Response
         end
 
         
