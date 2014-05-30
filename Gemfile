@@ -12,12 +12,10 @@ gem 'jbuilder'
 gem 'hashie'
 gem 'typhoeus'
 
+gem 'puma'
+
 gem 'oj', :platforms => 'ruby'
 gem 'jrjackson', :platforms => 'jruby'
-
-group :production do
-  gem 'unicorn'
-end
 
 group :development do
   platforms :jruby do
