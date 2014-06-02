@@ -1368,24 +1368,21 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
     }
 
     HeaderView.prototype.events = {
-      'click #show-pet-store-icon': 'showPetStore',
-      'click #show-wordnik-dev-icon': 'showWordnikDev',
-      'click #explore': 'showCustom',
-      'keyup #input_baseUrl': 'showCustomOnKeyup',
-      'keyup #input_apiKey': 'showCustomOnKeyup'
+      'click #show-v1-api': 'showV1Api',
+      'click #show-v2-api': 'showV2Api'
     };
 
     HeaderView.prototype.initialize = function() {};
 
-    HeaderView.prototype.showPetStore = function(e) {
+    HeaderView.prototype.showV1Api = function(e) {
       return this.trigger('update-swagger-ui', {
-        url: "http://petstore.swagger.wordnik.com/api/api-docs"
+        url: "/api/v1/swagger_doc.json"
       });
     };
 
-    HeaderView.prototype.showWordnikDev = function(e) {
+    HeaderView.prototype.showV2Api = function(e) {
       return this.trigger('update-swagger-ui', {
-        url: "http://api.wordnik.com/v4/resources.json"
+        url: "/api/v2/swagger_doc.json"
       });
     };
 
