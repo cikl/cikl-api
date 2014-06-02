@@ -15,6 +15,16 @@ module Cikl
           end
         end
 
+        if ENV['RACK_ENV'] == 'development'
+          map('/api/doc') do
+            use Rack::Static,
+              :urls => [""], 
+              :root => File.expand_path('../../vendor/swagger-ui', __FILE__),
+              :index => "index.html"
+            run lambda {|*|}
+          end
+        end
+
         use Cikl::Middleware::Elasticsearch, {}
 
         run Cikl::App.new

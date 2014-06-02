@@ -9,7 +9,10 @@ module Cikl
       prefix 'api'
       helpers ::Cikl::API::Helpers::Elasticsearch
       mount ::Cikl::API::Resources::Query
-      add_swagger_documentation
+
+      add_swagger_documentation( 
+                                :hide_documentation_path => true
+                               )
     end
   end
 end
