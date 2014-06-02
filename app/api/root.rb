@@ -1,18 +1,21 @@
 require 'grape'
-require 'api/validators/in_range'
-require 'api/helpers/elasticsearch'
-require 'api/resources/query'
+require 'api/v1/root'
 
 module Cikl
   module API
     class Root < Grape::API
       prefix 'api'
-      helpers ::Cikl::API::Helpers::Elasticsearch
-      mount ::Cikl::API::Resources::Query
 
-      add_swagger_documentation( 
-                                :hide_documentation_path => true
-                               )
+      version 'v1', :using => :path
+      mount ::Cikl::API::V1::Root
+      add_swagger_documentation hide_documentation_path: true,
+        api_version: 'v1'
+
+      ## This is for when we get to the point of having a v2...
+      #version 'v2', :using => :path
+      #mount ::Cikl::API::V2::Root
+      #add_swagger_documentation hide_documentation_path: true,
+      #  api_version: 'v2'
     end
   end
 end
