@@ -23,40 +23,37 @@ module Cikl
               requires :ipv4, type: String, regexp: /^(\d{1,3}\.){3}(\d{1,3})$/
             end
             resource :ipv4 do
+              IPV4_QUERY = [
+                ["observables.ipv4", ["observables.ipv4.ipv4"]],
+                ["observables.dns_answer", ["observables.dns_answer.ipv4"]],
+              ]
               post do
-                run_standard_query do |json|
-                  json.must do |json|
-                    json.multi_match do |json|
-                      json.query params[:ipv4]
-                      json.fields [
-                        'event.address.ipv4',
-                        'dns_answer.ipv4'
-                      ]
-                    end # multi_match
+                value = params[:ipv4]
+                run_standard_query do |z|
+                  z.should(IPV4_QUERY)  do |path, fields|
+                    es_nested_any(z, path, value, fields)
                   end
                 end
-              end
-            end
+              end # post
+            end # ipv4
 
             # fqdn handling
             params do
               requires :fqdn, type: String
             end
             resource :fqdn do
+              FQDN_QUERY = [
+                ["observables.fqdn", ["observables.fqdn.fqdn"]],
+                ["observables.dns_answer", ["observables.dns_answer.name", "observables.dns_answer.fqdn"]],
+              ]
               post do
-                run_standard_query do |json|
-                  json.must do |json|
-                    json.multi_match do |json|
-                      json.query params[:fqdn]
-                      json.fields [
-                        'event.address.fqdn',
-                        'dns_answer.name',
-                        'dns_answer.fqdn'
-                      ]
-                    end # multi_match
+                value = params[:fqdn]
+                run_standard_query do |z|
+                  z.should(FQDN_QUERY)  do |path, fields|
+                    es_nested_any(z, path, value, fields)
                   end
-                end # run_standard_query
-              end # post
+                end
+              end
             end
 
           end

@@ -11,32 +11,63 @@ module Cikl
   module API
     module Helpers
       module Query
-        def run_standard_query
-          query = Jbuilder.encode do |json|
-            json.query do |json|
-              json.bool do |json|
-                # Allow for caller to customize query.
-                yield(json)
+        def es_timestamp_query(z)
+          z.range do |z|
+            z.set!("@timestamp") do |z|
+              z.gte params.detecttime_min.iso8601
+              z.lte params.detecttime_max.iso8601 if params.detecttime_max?
+            end
+          end
+        end
 
-                json.must do |json|
-                  json.range do |json|
-                    json.set!("@timestamp") do |json|
-                      json.gte params.detecttime_min.iso8601
-                      json.lte params.detecttime_max.iso8601 if params.detecttime_max?
+        def es_nested_any(z, path, query, fields = [])
+          z.nested do 
+            z.path path
+            z.query do
+              z.multi_match do |z|
+                z.query query
+                z.fields fields 
+              end # multi_match
+            end
+          end
+        end
+
+        def run_standard_query
+          query = Jbuilder.encode do |z|
+            z.query do
+              z.bool do
+
+                z.must do
+                  # Allow for caller to customize query.
+                  z.child! do
+                    z.bool do
+                      yield(z)
                     end
+                  end
+
+                  z.child! do
+                    es_timestamp_query(z)
                   end
                 end # must
               end
             end
           end
-          es_response = elasticsearch_client.search({
+
+          run_query_and_return(query)
+        end
+
+        def run_query_and_return(query)
+          es_response = run_query(query)
+
+          present hits_to_response(es_response['hits']['hits']), with: Cikl::API::Entities::Response
+        end
+        def run_query(query)
+          elasticsearch_client.search({
             index: 'cikl-*',
             size: params[:size],
             from: params[:from],
             body: query
           })
-
-          present hits_to_response(es_response['hits']['hits']), with: Cikl::API::Entities::Response
         end
 
         
@@ -60,37 +91,26 @@ module Cikl
                 reporttime: src["reporttime"],
                 source: src["source"]
               })
-              src["address"].each_pair do |key, val|
+              src["observables"].each_pair do |key, val|
+                dest = nil
+                klass = nil
                 case key
                 when "ipv4"
-                  event.observables.ipv4 << Cikl::Models::Observable::Ipv4.new(
-                    :ipv4 => val
-                  )
+                  dest = event.observables.ipv4
+                  klass = Cikl::Models::Observable::Ipv4
                 when "fqdn"
-                  event.observables.fqdn << Cikl::Models::Observable::Fqdn.new(
-                    :fqdn => val
-                  )
+                  dest = event.observables.fqdn
+                  klass = Cikl::Models::Observable::Fqdn
+                when "dns_answer"
+                  dest = event.observables.dns_answer
+                  klass = Cikl::Models::Observable::DnsAnswer
+                else 
+                  next
+                end
+                val.each do |obj|
+                  dest << klass.new(obj)
                 end
               end
-              yield event
-            when 'dns_answer'
-              src = hit["_source"]
-              event = Cikl::Models::Event.new({
-                detecttime: src["@timestamp"],
-                reporttime: src["@timestamp"],
-                source: "resolver"
-              })
-              dns_answer = Cikl::Models::Observable::DnsAnswer.new({ 
-                resolver: src["worker"],
-                name: src["name"],
-                section: src["section"],
-                rr_class: src["rr_class"],
-                rr_type: src["rr_type"],
-                ipv4: src["ipv4"],
-                ipv6: src["ipv6"],
-                fqdn: src["fqdn"]
-              })
-              event.observables.dns_answer << dns_answer
               yield event
             else 
               nil
