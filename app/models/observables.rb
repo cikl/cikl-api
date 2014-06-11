@@ -1,4 +1,8 @@
 require 'hashie'
+require 'models/observable/dns_answer'
+require 'models/observable/ipv4'
+require 'models/observable/fqdn'
+
 module Cikl
   module Models
     class Observables < Hashie::Dash
