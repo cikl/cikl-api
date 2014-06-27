@@ -77,10 +77,11 @@ module Cikl
           serialized
         end
         def run_query(query)
+          offset = (params[:page] - 1) * params[:per_page]
           elasticsearch_client.search({
             index: 'cikl-*',
-            size: params[:size],
-            from: params[:from],
+            size: params[:per_page],
+            from: offset,
             fields: [],
             body: query
           })
@@ -88,7 +89,11 @@ module Cikl
 
         
         def build_response(es_response)
-          response = Cikl::Models::Response.new
+          response = Cikl::Models::Response.new(
+            page: params[:page],
+            per_page: params[:per_page],
+            total: es_response["hits"]["total"]
+          )
           events = response.events
           hits_to_events(es_response["hits"]["hits"]) do |event|
             events << event

@@ -8,8 +8,12 @@ module Cikl
       module Resources
         class Query < Grape::API
           params do
-            optional :size, type: Integer, default: 50, in_range: 1..2000
-            optional :from, type: Integer, default: 0
+            optional :per_page, type: Integer, 
+              default: 50, in_range: 1..2000,
+              desc: "Number of events per page. Expects: Integer between 1 and 2000. Default: 50."
+            optional :page, type: Integer, default: 1,
+              desc: "Page offset. Default: 1"
+
             optional :assessment, type: String
             optional :detecttime_min, type: DateTime, default: lambda { DateTime.now - 30 } # 30 days ago 
             optional :detecttime_max, type: DateTime

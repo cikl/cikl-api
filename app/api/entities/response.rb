@@ -8,6 +8,9 @@ module Cikl
         expose :count do |e,o| 
           e.events.count
         end
+        expose :total
+        expose :page
+        expose :per_page
         expose :events, using: Cikl::API::Entities::Event
         expose :timing do
           expose :backend do
