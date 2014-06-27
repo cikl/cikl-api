@@ -2,15 +2,17 @@
 source "https://rubygems.org"
 
 gem 'grape'
-gem 'grape-entity'
+gem 'grape-entity', '>= 0.4.3'
 gem 'grape-swagger'
 gem 'multi_json'
 gem 'rack-cors'
 gem 'elasticsearch'
 gem 'connection_pool'
 gem 'jbuilder'
-gem 'hashie'
 gem 'typhoeus'
+gem 'mongo'
+gem 'bson_ext'
+gem 'virtus'
 
 gem 'puma'
 

@@ -1,11 +1,16 @@
-require 'hashie'
+require 'virtus'
 
 module Cikl
   module Models
     module Observable
 
-      class Fqdn < Hashie::Dash
-        property :fqdn
+      class Fqdn 
+        include Virtus.model
+        attribute :fqdn, String
+
+        class << self
+          alias_method :from_hash, :new
+        end
       end
 
     end

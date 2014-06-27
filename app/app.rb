@@ -1,5 +1,6 @@
 require 'api/root'
 require 'middleware/elasticsearch'
+require 'middleware/mongo'
 
 module Cikl
   class App
@@ -26,6 +27,7 @@ module Cikl
         end
 
         use Cikl::Middleware::Elasticsearch, {}
+        use Cikl::Middleware::Mongo, {}
 
         run Cikl::App.new
       end.to_app
