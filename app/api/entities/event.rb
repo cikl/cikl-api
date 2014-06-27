@@ -5,8 +5,12 @@ module Cikl
   module API
     module Entities
       class Event < Grape::Entity
-        expose :reporttime
-        expose :detecttime
+        format_with(:iso_timestamp) { |dt| dt.iso8601 if dt.respond_to?(:iso8601) }
+
+        with_options(format_with: :iso_timestamp) do
+          expose :reporttime
+          expose :detecttime
+        end
         expose :source
         expose :observables, using: Cikl::API::Entities::Observables
       end
