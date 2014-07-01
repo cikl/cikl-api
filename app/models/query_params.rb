@@ -8,6 +8,8 @@ module Cikl
       attribute :start, Integer
       attribute :per_page, Integer
       attribute :assessment, String
+      attribute :order_by, Symbol
+      attribute :order, Symbol
       attribute :timing, Integer
       attribute :detecttime_min, DateTime
       attribute :detecttime_max, DateTime

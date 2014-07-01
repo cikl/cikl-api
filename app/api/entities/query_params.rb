@@ -24,6 +24,27 @@ module Cikl
             desc: "Number of events per page. Expects: Integer between 1 and 2000. Default: 50."
           }
 
+        VALID_ORDER_BY_VALUES = [
+          :detecttime
+        ]
+
+        expose :order_by,
+          documentation: {
+            type: Symbol,
+            default: :detecttime,
+            values: VALID_ORDER_BY_VALUES,
+            desc: "Event field with which to order the events. Default: detecttime. Accepts: #{VALID_ORDER_BY_VALUES.join(', ')}"
+          }
+
+        VALID_ORDER_VALUES = [ :asc, :desc ]
+        expose :order,
+          documentation: {
+            type: Symbol,
+            default: :desc,
+            values: VALID_ORDER_VALUES,
+            desc: "Order in which to arrange events, ascending or descending. Default: desc. Accepts: #{VALID_ORDER_VALUES.join(', ')}"
+          }
+
         expose :timing, {
           documentation: {
             type: Integer, 

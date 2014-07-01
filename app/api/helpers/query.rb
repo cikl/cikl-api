@@ -77,14 +77,22 @@ module Cikl
           present response, with: Cikl::API::Entities::Response, timing: params[:timing]
         end
 
+        SORT_MAP = {
+          :detecttime => '@timestamp'
+        }
+
         def run_query(query)
-          elasticsearch_client.search({
+          query_opts = {
             index: 'cikl-*',
             size: params[:per_page],
             from: params[:start] - 1,
             fields: [],
             body: query
-          })
+          }
+          if sort_field = SORT_MAP[params[:order_by]]
+            query_opts[:sort] = "#{sort_field}:#{params[:order]}"
+          end
+          elasticsearch_client.search(query_opts)
         end
 
         
