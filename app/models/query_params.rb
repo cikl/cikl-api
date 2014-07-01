@@ -11,8 +11,10 @@ module Cikl
       attribute :order_by, Symbol
       attribute :order, Symbol
       attribute :timing, Integer
-      attribute :detecttime_min, DateTime
-      attribute :detecttime_max, DateTime
+      attribute :import_time_min, DateTime
+      attribute :import_time_max, DateTime
+      attribute :detect_time_min, DateTime
+      attribute :detect_time_max, DateTime
     end
   end
 end

@@ -13,9 +13,9 @@ module Cikl
       module Query
         def es_timestamp_query(z)
           z.range do |z|
-            z.set!("@timestamp") do |z|
-              z.gte params.detecttime_min.iso8601
-              z.lte params.detecttime_max.iso8601 if params.detecttime_max?
+            z.set!("import_time") do |z|
+              z.gte params.import_time_min.iso8601
+              z.lte params.import_time_max.iso8601 if params.import_time_max?
             end
           end
         end
@@ -78,7 +78,8 @@ module Cikl
         end
 
         SORT_MAP = {
-          :detecttime => '@timestamp'
+          :detect_time => :detect_time,
+          :import_time => :import_time,
         }
 
         def run_query(query)

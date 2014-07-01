@@ -25,15 +25,16 @@ module Cikl
           }
 
         VALID_ORDER_BY_VALUES = [
-          :detecttime
+          :import_time,
+          :detect_time
         ]
 
         expose :order_by,
           documentation: {
             type: Symbol,
-            default: :detecttime,
+            default: :import_time,
             values: VALID_ORDER_BY_VALUES,
-            desc: "Event field with which to order the events. Default: detecttime. Accepts: #{VALID_ORDER_BY_VALUES.join(', ')}"
+            desc: "Event field with which to order the events. Default: import_time. Accepts: #{VALID_ORDER_BY_VALUES.join(', ')}"
           }
 
         VALID_ORDER_VALUES = [ :asc, :desc ]
@@ -54,13 +55,23 @@ module Cikl
         }
 
         with_options(format_with: :iso_timestamp) do
-          expose :detecttime_min,
+          expose :import_time_min,
             documentation: {
               type: DateTime,
               default: lambda { DateTime.now - 30 } # 30 days ago 
             }
 
-          expose :detecttime_max,
+          expose :import_time_max,
+            documentation: {
+              type: DateTime
+            }
+
+          expose :detect_time_min,
+            documentation: {
+              type: DateTime
+            }
+
+          expose :detect_time_max,
             documentation: {
               type: DateTime
             }
