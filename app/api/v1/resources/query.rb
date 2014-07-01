@@ -12,8 +12,6 @@ module Cikl
 
           params do
             requires :none, using: Cikl::API::Entities::QueryParams.documentation
-            optional :timing, type: Integer, default: 0, 
-              desc: "Include timing information in response. 1 for true, 0 for false."
           end
 
           namespace :query do

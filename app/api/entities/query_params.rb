@@ -24,6 +24,14 @@ module Cikl
             desc: "Number of events per page. Expects: Integer between 1 and 2000. Default: 50."
           }
 
+        expose :timing, {
+          documentation: {
+            type: Integer, 
+            default: 0, 
+            desc: "Include timing information in response. 1 for true, 0 for false."
+          }
+        }
+
         with_options(format_with: :iso_timestamp) do
           expose :detecttime_min,
             documentation: {
