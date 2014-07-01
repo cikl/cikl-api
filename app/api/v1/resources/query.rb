@@ -10,10 +10,15 @@ module Cikl
         class Query < Grape::API
           helpers Cikl::API::Helpers::Query
 
+          params do
+            requires :none, using: Cikl::API::Entities::QueryParams.documentation
+            optional :timing, type: Integer, default: 0, 
+              desc: "Include timing information in response. 1 for true, 0 for false."
+          end
+
           namespace :query do
             # ipv4 handling
             params do
-              requires :none, using: Cikl::API::Entities::QueryParams.documentation
               requires :ipv4, type: String, regexp: /^(\d{1,3}\.){3}(\d{1,3})$/
             end
             resource :ipv4 do
@@ -36,7 +41,6 @@ module Cikl
 
             # fqdn handling
             params do
-              requires :none, using: Cikl::API::Entities::QueryParams.documentation
               requires :fqdn, type: String
             end
             resource :fqdn do

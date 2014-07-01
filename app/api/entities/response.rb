@@ -2,6 +2,8 @@ require 'grape'
 require 'grape-entity'
 require 'api/entities/query_params'
 require 'api/entities/event'
+require 'api/entities/timing'
+
 module Cikl
   module API
     module Entities
@@ -33,17 +35,14 @@ module Cikl
             desc: 'The set of events matching the query' 
           }
 
-        expose :timing do
-          expose :backend do
-            expose :timing_backend_total, as: :total
-          end
-          expose :elasticsearch do
-            expose :timing_elasticsearch_total, as: :total
-            expose :timing_elasticsearch_internal_query, as: :internal_query
-          end
-          expose :test do |model, options|
-          end
-        end
+        expose :timing,
+          using: Cikl::API::Entities::Timing,
+          if: { timing: 1 },
+          documentation:
+          {
+            desc: 'Timing data for the query and rendering of results'
+          }
+
       end
     end
   end
