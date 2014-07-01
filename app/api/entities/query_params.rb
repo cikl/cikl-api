@@ -8,6 +8,7 @@ module Cikl
   module API
     module Entities
       class QueryParams < Grape::Entity
+        format_with(:iso_timestamp) { |dt| dt.iso8601 if dt.respond_to?(:iso8601) }
         expose :start,
           documentation: {
             type: Integer,
@@ -28,16 +29,18 @@ module Cikl
             type: String
           }
 
-        expose :detecttime_min,
-          documentation: {
-            type: DateTime,
-            default: lambda { DateTime.now - 30 } # 30 days ago 
-          }
+        with_options(format_with: :iso_timestamp) do
+          expose :detecttime_min,
+            documentation: {
+              type: DateTime,
+              default: lambda { DateTime.now - 30 } # 30 days ago 
+            }
 
-        expose :detecttime_max,
-          documentation: {
-            type: DateTime
-          }
+          expose :detecttime_max,
+            documentation: {
+              type: DateTime
+            }
+        end
       end
 
     end
