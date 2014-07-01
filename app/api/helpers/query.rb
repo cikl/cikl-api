@@ -57,44 +57,51 @@ module Cikl
         end
 
         def run_query_and_return(query)
-          orig_start = Time.now
+          orig_start = get_request_start_time()
+          query_start = es_query_start = Time.now
           es_response = run_query(query)
-          timing_elasticsearch_total = Time.now - orig_start
+          es_query_finish = Time.now
 
-          start = Time.now
+          backend_start = Time.now
           response = build_response(es_response)
-          response.timing_backend_total = ((Time.now - start) * 1000).to_i
-          response.timing_elasticsearch_internal_query = es_response["took"].to_i
-          response.timing_elasticsearch_total = (timing_elasticsearch_total * 1000).to_i
-
-          start = Time.now
-          serialized = Cikl::API::Entities::Response.represent(response, :serializable => true)
-          serialized_total = Time.now - start
-          total = Time.now - orig_start
-
-          serialized[:timing][:serialization] = { :total => (serialized_total * 1000).to_i }
-          serialized[:timing][:total] = (total * 1000).to_i
-          serialized
+          backend_finish = Time.now
+          response.timing = Cikl::Models::Timing.new(
+            request_start: orig_start,
+            query_start: query_start,
+            elasticsearch_start: es_query_start,
+            elasticsearch_finish: es_query_finish,
+            backend_start: backend_start,
+            backend_finish: backend_finish,
+            elasticsearch_internal_query: es_response["took"].to_i
+          )
+          present response, with: Cikl::API::Entities::Response, timing: params[:timing]
         end
+
+        SORT_MAP = {
+          :detecttime => '@timestamp'
+        }
+
         def run_query(query)
-          elasticsearch_client.search({
+          query_opts = {
             index: 'cikl-*',
-            size: params[:size],
-            from: params[:from],
+            size: params[:per_page],
+            from: params[:start] - 1,
             fields: [],
             body: query
-          })
+          }
+          if sort_field = SORT_MAP[params[:order_by]]
+            query_opts[:sort] = "#{sort_field}:#{params[:order]}"
+          end
+          elasticsearch_client.search(query_opts)
         end
 
         
         def build_response(es_response)
-          response = Cikl::Models::Response.new
-          events = response.events
-          hits_to_events(es_response["hits"]["hits"]) do |event|
-            events << event
-          end
-
-          response
+          return Cikl::Models::Response.new(
+            total_events: es_response["hits"]["total"],
+            query: params,
+            events: hits_to_events(es_response["hits"]["hits"]).to_a
+          )
         end
 
         def hits_to_events_es(hits)
@@ -104,6 +111,7 @@ module Cikl
             yield Cikl::Models::Event.from_hash(hit["_source"])
           end
         end
+
         def hits_to_events(hits)
           return enum_for(:hits_to_events, hits) unless block_given?
           ids = hits.map { |hit| hit["_id"] }

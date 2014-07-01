@@ -1,6 +1,7 @@
 require 'api/root'
 require 'middleware/elasticsearch'
 require 'middleware/mongo'
+require 'middleware/request_start_time'
 
 module Cikl
   class App
@@ -9,6 +10,8 @@ module Cikl
 
     def self.instance
       @instance ||= Rack::Builder.new do
+        use Cikl::Middleware::RequestStartTime
+
         use Rack::Cors do
           allow do
             origins '*'
